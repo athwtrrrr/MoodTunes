@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/moodSelectFragment">
+
+    <fragment
+        android:id="@+id/moodSelectFragment"
+        android:name="com.example.myspecial.moodtunes.ui.moodselect.MoodSelectFragment"
+        android:label="How are you feeling?"
+        tools:layout="@layout/fragment_mood_select">
+
+        <!-- Action to Recommendations with argument -->
+        <action
+            android:id="@+id/action_moodSelectFragment_to_recommendationsFragment"
+            app:destination="@id/recommendationsFragment" />
+
+        <!-- Action to History -->
+        <action
+            android:id="@+id/action_moodSelectFragment_to_moodHistoryFragment"
+            app:destination="@id/moodHistoryFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/recommendationsFragment"
+        android:name="com.example.myspecial.moodtunes.ui.recommendations.RecommendationsFragment"
+        android:label="Song Recommendations"
+        tools:layout="@layout/fragment_recommendations">
+
+        <!-- Add argument for mood -->
+        <argument
+            android:name="mood"
+            app:argType="string" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/moodHistoryFragment"
+        android:name="com.example.myspecial.moodtunes.ui.history.MoodHistoryFragment"
+        android:label="Your Mood History"
+        tools:layout="@layout/fragment_mood_history" />
+
+</navigation>
