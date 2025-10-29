@@ -2,13 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
+        android:id="@+id/tvMoodTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Songs for Mood"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Song Recommendations"
-        android:textSize="24sp" />
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSongs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btnSaveToLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save to Mood Log"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
 </LinearLayout>

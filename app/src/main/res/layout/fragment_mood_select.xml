@@ -1,88 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@color/white">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="How are you feeling?"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Row 1: Happy and Sad -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="How are you feeling?"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="48dp"
-            android:layout_marginTop="24dp" />
-
-        <!-- Happy Mood -->
         <Button
             android:id="@+id/btnHappy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Happy"
-            android:textSize="20sp"
-            android:layout_marginBottom="16dp"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="😊 Happy"
+            android:textSize="16sp"
             android:backgroundTint="@color/happy_color"
-            android:textColor="@color/white" />
+            android:textColor="@android:color/white" />
 
-        <!-- Sad Mood -->
         <Button
             android:id="@+id/btnSad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sad"
-            android:textSize="20sp"
-            android:layout_marginBottom="16dp"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="😢 Sad"
+            android:textSize="16sp"
             android:backgroundTint="@color/sad_color"
-            android:textColor="@color/white" />
-
-        <!-- Calm Mood -->
-        <Button
-            android:id="@+id/btnCalm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Calm"
-            android:textSize="20sp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/calm_color"
-            android:textColor="@color/white" />
-
-        <!-- Energetic Mood -->
-        <Button
-            android:id="@+id/btnEnergetic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Energetic"
-            android:textSize="20sp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/energetic_color"
-            android:textColor="@color/white" />
-
-        <!-- Chill Mood -->
-        <Button
-            android:id="@+id/btnChill"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chill"
-            android:textSize="20sp"
-            android:layout_marginBottom="48dp"
-            android:backgroundTint="@color/chill_color"
-            android:textColor="@color/white" />
-
-        <!-- View History Button -->
-        <Button
-            android:id="@+id/btnViewHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View My Mood History"
-            android:textSize="16sp" />
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
-</ScrollView>
+    <!-- Row 2: Calm and Energetic -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnCalm"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="😌 Calm"
+            android:textSize="16sp"
+            android:backgroundTint="@color/calm_color"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnEnergetic"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="⚡ Energetic"
+            android:textSize="16sp"
+            android:backgroundTint="@color/energetic_color"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- Row 3: Chill and Angry -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnChill"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="🎵 Focused"
+            android:textSize="16sp"
+            android:backgroundTint="@color/focused_color"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnAngry"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="😠 Angry"
+            android:textSize="16sp"
+            android:backgroundTint="@color/angry_color"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- Row 4: Romantic (centered) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="32dp">
+
+        <Button
+            android:id="@+id/btnRomantic"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:text="❤️ Romantic"
+            android:textSize="16sp"
+            android:backgroundTint="@color/romantic_color"
+            android:textColor="@android:color/white" />
+
+        <!-- Empty space to maintain layout balance -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+    <!-- History Button -->
+    <Button
+        android:id="@+id/btnViewHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Mood History"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>
