@@ -1,9 +1,8 @@
 package com.example.myspecial.moodtunes.data.model
+
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-
 
 @Entity(tableName = "mood_logs")
 data class MoodLog(
@@ -21,6 +20,9 @@ data class MoodLog(
 
     @ColumnInfo(name = "album_cover_url")
     val albumCoverUrl: String? = null,
+
+    @ColumnInfo(name = "note")
+    val note: String = "",  // Fixed: non-null with default value
 
     @ColumnInfo(name = "timestamp")
     val timestamp: Long = System.currentTimeMillis()

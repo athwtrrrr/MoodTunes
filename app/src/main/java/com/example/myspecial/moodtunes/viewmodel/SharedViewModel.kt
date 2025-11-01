@@ -1,182 +1,212 @@
 package com.example.myspecial.moodtunes.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myspecial.moodtunes.data.local.AppDatabase
+import com.example.myspecial.moodtunes.data.local.MoodLogDao
+import com.example.myspecial.moodtunes.data.model.MoodLog
 import com.example.myspecial.moodtunes.data.repository.MusicRepository
 import com.example.myspecial.moodtunes.data.repository.Song
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.Job
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
 import java.net.URL
 import com.example.myspecial.moodtunes.R
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import kotlinx.coroutines.delay
 
-class SharedViewModel : ViewModel() {
+class SharedViewModel(application: Application) : AndroidViewModel(application) {
     private val musicRepository = MusicRepository()
+    private val moodLogDao: MoodLogDao = AppDatabase.getInstance(application).moodLogDao()
 
+    // Mood and song recommendation flows
     private val _selectedMood = MutableStateFlow<String?>(null)
-    val selectedMood: LiveData<String?> = _selectedMood.asLiveData()
+    val selectedMood: StateFlow<String?> = _selectedMood.asStateFlow()
 
     private val _recommendedSongs = MutableStateFlow<List<Song>>(emptyList())
-    val recommendedSongs: LiveData<List<Song>> = _recommendedSongs.asLiveData()
+    val recommendedSongs: StateFlow<List<Song>> = _recommendedSongs.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: LiveData<Boolean> = _isLoading.asLiveData()
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    fun prepareSong(song: Song) {
-        val currentState = _playbackState.value ?: PlaybackState()
-        _playbackState.value = currentState.copy(currentSong = song, isPlaying = false)
-        println("DEBUG: Preparing song: ${song.title}")
+    // Playback state flows
+    private val _currentlyPlayingSong = MutableStateFlow<Song?>(null)
+    val currentlyPlayingSong: StateFlow<Song?> = _currentlyPlayingSong.asStateFlow()
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
+    // Mood logs filtering
+    private val _currentFilter = MutableStateFlow("All")
+    val currentFilter: StateFlow<String> = _currentFilter.asStateFlow()
+
+    // Combine flows for filtered mood logs
+    val filteredMoodLogs = _currentFilter.combine(moodLogDao.getAllMoodLogs()) { filter, allLogs ->
+        when (filter) {
+            "All" -> allLogs
+            else -> allLogs.filter { it.mood == filter }
+        }
     }
 
-    // Combined playback state
-    data class PlaybackState(
-        val currentSong: Song? = null,
-        val isPlaying: Boolean = false
-    )
+    private val imageLoadingJobs = mutableMapOf<String, kotlinx.coroutines.Job>()
 
-    private val _playbackState = MutableLiveData<PlaybackState>(PlaybackState())
-    val playbackState: LiveData<PlaybackState> = _playbackState
-
-    val currentlyPlayingSong = _playbackState.map { it.currentSong }
-    val isPlaying = _playbackState.map { it.isPlaying }
-
-    private val imageLoadingJobs = mutableMapOf<String, Job>()
-
+    // Mood and song methods
     fun setSelectedMood(mood: String) {
         _selectedMood.value = mood
         fetchSongsForMood(mood)
     }
 
     private fun fetchSongsForMood(mood: String) {
-        println("DEBUG: Fetching songs for mood: $mood")
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val songs = musicRepository.getSongsByMood(mood)
-                println("DEBUG: Retrieved ${songs.size} songs")
                 _recommendedSongs.value = songs
             } catch (e: Exception) {
-                println("DEBUG: Error fetching songs: ${e.message}")
                 _recommendedSongs.value = emptyList()
+                e.printStackTrace()
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    // Playback control methods using combined state
+    // Playback control methods
+    fun togglePlayback(song: Song? = null) {
+        if (song != null && _currentlyPlayingSong.value != song) {
+            // New song selected
+            _currentlyPlayingSong.value = song
+            _isPlaying.value = true
+        } else if (_currentlyPlayingSong.value != null) {
+            // Toggle current song
+            _isPlaying.value = !_isPlaying.value
+        } else if (song != null) {
+            // Start playing a new song
+            _currentlyPlayingSong.value = song
+            _isPlaying.value = true
+        }
+    }
+
     fun playSong(song: Song) {
-        _playbackState.value = PlaybackState(song, true)
-        println("DEBUG: Playing song: ${song.title}")
+        _currentlyPlayingSong.value = song
+        _isPlaying.value = true
     }
 
-    fun pauseSong() {
-        val currentState = _playbackState.value ?: PlaybackState()
-        _playbackState.value = currentState.copy(isPlaying = false)
-        println("DEBUG: Playback paused")
+    fun pausePlayback() {
+        _isPlaying.value = false
     }
 
-    fun resumeSong() {
-        val currentState = _playbackState.value ?: PlaybackState()
-        _playbackState.value = currentState.copy(isPlaying = true)
-        println("DEBUG: Playback resumed")
+    fun resumePlayback() {
+        if (_currentlyPlayingSong.value != null) {
+            _isPlaying.value = true
+        }
     }
 
-    fun stopSong() {
-        _playbackState.value = PlaybackState()
-        println("DEBUG: Playback stopped")
+    fun stopPlayback() {
+        _isPlaying.value = false
+        _currentlyPlayingSong.value = null
     }
 
-    fun togglePlayPause(song: Song) {
-        val currentState = _playbackState.value ?: PlaybackState()
-        val isSameSong = currentState.currentSong?.id == song.id
+    fun onPlaybackCompleted() {
+        _isPlaying.value = false
+        // Keep the current song reference for potential replay
+    }
 
-        if (isSameSong && currentState.isPlaying) {
-            // Pause current song
-            _playbackState.value = currentState.copy(isPlaying = false)
-            println("DEBUG: Pausing current song")
-        } else if (isSameSong && !currentState.isPlaying) {
-            // Resume current song
-            _playbackState.value = currentState.copy(isPlaying = true)
-            println("DEBUG: Resuming current song")
-        } else {
-            // New song - first set the song without playing, then start playing
-            // This gives the fragment time to prepare the MediaPlayer
-            _playbackState.value = PlaybackState(song, false)
-            println("DEBUG: Setting new song: ${song.title}")
+    fun onPlaybackError() {
+        _isPlaying.value = false
+        // Optionally clear the current song on error
+        _currentlyPlayingSong.value = null
+    }
 
-            // Start playing after a short delay to allow preparation
-            viewModelScope.launch {
-                delay(100) // Short delay to allow MediaPlayer preparation
-                _playbackState.value = PlaybackState(song, true)
-                println("DEBUG: Starting playback for: ${song.title}")
+    fun clearSongs() {
+        _recommendedSongs.value = emptyList()
+        stopPlayback()
+    }
+
+    // Database CRUD operations
+    fun saveMoodLog(mood: String, songTitle: String, artist: String, albumCoverUrl: String?, note: String = "") {
+        viewModelScope.launch {
+            try {
+                val moodLog = MoodLog(
+                    mood = mood,
+                    songTitle = songTitle,
+                    artist = artist,
+                    albumCoverUrl = albumCoverUrl,
+                    note = note
+                )
+                moodLogDao.insertMoodLog(moodLog)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
 
-    fun onPlaybackCompleted() {
-        _playbackState.value = PlaybackState()
-        println("DEBUG: Playback completed")
+    fun updateMoodLogNote(moodLog: MoodLog, newNote: String) {
+        viewModelScope.launch {
+            try {
+                val updatedMoodLog = moodLog.copy(note = newNote)
+                moodLogDao.updateMoodLog(updatedMoodLog)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
-    fun onPlaybackError() {
-        _playbackState.value = PlaybackState()
-        println("DEBUG: Playback error occurred")
+    fun deleteMoodLog(moodLog: MoodLog) {
+        viewModelScope.launch {
+            try {
+                moodLogDao.deleteMoodLog(moodLog)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
-    // Improved image loading with better memory management
+    // Filter mood logs by mood type
+    fun filterMoodLogs(moodType: String) {
+        _currentFilter.value = moodType
+    }
+
+    // Get stats for display
+    fun getMoodStats(moodLogs: List<MoodLog>): Map<String, Int> {
+        return moodLogs.groupingBy { it.mood }.eachCount()
+    }
+
+    // Image loading methods
     fun loadImageForView(imageUrl: String, imageView: ImageView) {
-        // Cancel any existing job for this ImageView
         val viewId = imageView.hashCode().toString()
         imageLoadingJobs[viewId]?.cancel()
 
-        // Start new image loading job
         val job = viewModelScope.launch {
             try {
-                println("DEBUG: Loading image from: $imageUrl")
-                val bitmap = withContext(Dispatchers.IO) {
+                val bitmap = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                     loadImageBitmap(imageUrl)
                 }
 
                 if (bitmap != null) {
-                    println("DEBUG: Image loaded successfully")
-                    // Set bitmap on main thread
-                    withContext(Dispatchers.Main) {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                         imageView.setImageBitmap(bitmap)
                     }
                 } else {
-                    println("DEBUG: Failed to load image, using placeholder")
-                    withContext(Dispatchers.Main) {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                         imageView.setImageResource(R.drawable.ic_music_note)
                     }
                 }
             } catch (e: Exception) {
-                println("DEBUG: Image loading error: ${e.message}")
-                withContext(Dispatchers.Main) {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     imageView.setImageResource(R.drawable.ic_music_note)
                 }
             }
         }
 
         imageLoadingJobs[viewId] = job
-
-        // Clean up job when it completes
-        job.invokeOnCompletion {
-            imageLoadingJobs.remove(viewId)
-        }
+        job.invokeOnCompletion { imageLoadingJobs.remove(viewId) }
     }
 
-    // Cancel image loading for a specific ImageView
     fun cancelImageLoading(imageView: ImageView) {
         val viewId = imageView.hashCode().toString()
         imageLoadingJobs[viewId]?.cancel()
@@ -185,7 +215,6 @@ class SharedViewModel : ViewModel() {
 
     private suspend fun loadImageBitmap(url: String): Bitmap? {
         return try {
-            println("DEBUG: Downloading image from: $url")
             val connection = URL(url).openConnection().apply {
                 connectTimeout = 10000
                 readTimeout = 10000
@@ -196,30 +225,14 @@ class SharedViewModel : ViewModel() {
             val inputStream = connection.getInputStream()
             val bitmap = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
-
-            if (bitmap == null) {
-                println("DEBUG: BitmapFactory returned null for URL: $url")
-            }
-
             bitmap
         } catch (e: Exception) {
-            println("DEBUG: Error loading image: ${e.message}")
-            e.printStackTrace()
             null
         }
     }
 
-    fun clearSongs() {
-        _recommendedSongs.value = emptyList()
-        stopSong()
-        // Cancel all image loading jobs
-        imageLoadingJobs.values.forEach { it.cancel() }
-        imageLoadingJobs.clear()
-    }
-
     override fun onCleared() {
         super.onCleared()
-        // Cancel all coroutines when ViewModel is cleared
         imageLoadingJobs.values.forEach { it.cancel() }
         imageLoadingJobs.clear()
     }

@@ -22,7 +22,10 @@ class MoodSelectFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mood_select, container, false)
 
         // Initialize ViewModel
-        viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        ).get(SharedViewModel::class.java)
 
         setupClickListeners(view)
         return view

@@ -92,7 +92,8 @@ class SongAdapter(
         holder.playButton.setOnClickListener {
             val currentPosition = holder.adapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                viewModel.togglePlayPause(songs[currentPosition])
+                // FIX: Use the correct method name - togglePlayback instead of togglePlayPause
+                viewModel.togglePlayback(songs[currentPosition])
                 notifyDataSetChanged() // Refresh to show state change
             }
         }

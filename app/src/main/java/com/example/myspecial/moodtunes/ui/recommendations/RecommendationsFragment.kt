@@ -9,16 +9,28 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myspecial.moodtunes.R
 import com.example.myspecial.moodtunes.data.repository.Song
 import com.example.myspecial.moodtunes.viewmodel.SharedViewModel
 import android.media.AudioManager
+import android.util.Log
+import android.widget.Toast
+import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
 class RecommendationsFragment : Fragment() {
 
-    private lateinit var viewModel: SharedViewModel
+    private val viewModel: SharedViewModel by viewModels(
+        ownerProducer = { requireActivity() }
+    )
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvMoodTitle: TextView
@@ -28,10 +40,7 @@ class RecommendationsFragment : Fragment() {
     private var mediaPlayer: MediaPlayer? = null
     private var selectedSong: Song? = null
     private var currentPreviewUrl: String? = null
-
     private var isMediaPlayerPrepared = false
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,18 +53,20 @@ class RecommendationsFragment : Fragment() {
         tvMoodTitle = view.findViewById(R.id.tvMoodTitle)
         btnSaveToLog = view.findViewById(R.id.btnSaveToLog)
 
+        // Initially hide save button until song is selected
+        btnSaveToLog.visibility = View.GONE
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
 
+        // Set initial mood title
         viewModel.selectedMood.value?.let { mood ->
             tvMoodTitle.text = "Songs for $mood Mood"
         }
@@ -77,44 +88,64 @@ class RecommendationsFragment : Fragment() {
 
     private fun setupObservers() {
         // Observe songs list
-        viewModel.recommendedSongs.observe(viewLifecycleOwner) { songs ->
-            println("DEBUG Fragment: Received ${songs.size} songs")
-            adapter.updateSongs(songs)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.recommendedSongs.collectLatest { songs ->
+                    Log.d("RecommendationsFragment", "Received ${songs.size} songs")
+                    adapter.updateSongs(songs)
+                }
+            }
         }
 
         // Observe loading state
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            println("DEBUG Fragment: Loading state: $isLoading")
-            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            recyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isLoading.collectLatest { isLoading ->
+                    Log.d("RecommendationsFragment", "Loading state: $isLoading")
+                    progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
+                }
+            }
         }
 
         // Observe selected mood
-        viewModel.selectedMood.observe(viewLifecycleOwner) { mood ->
-            mood?.let {
-                tvMoodTitle.text = "Songs for $mood Mood"
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedMood.collectLatest { mood ->
+                    mood?.let {
+                        tvMoodTitle.text = "Songs for $mood Mood"
+                    }
+                }
             }
         }
 
         // Observe playback state changes
-        viewModel.currentlyPlayingSong.observe(viewLifecycleOwner) { playingSong ->
-            println("DEBUG: Currently playing song changed: ${playingSong?.title}")
-            adapter.notifyDataSetChanged()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.currentlyPlayingSong.collectLatest { playingSong ->
+                    Log.d("RecommendationsFragment", "Currently playing song changed: ${playingSong?.title}")
+                    adapter.notifyDataSetChanged()
 
-            if (playingSong != null) {
-                handleSongChange(playingSong)
-            } else {
-                stopMediaPlayer()
+                    if (playingSong != null) {
+                        handleSongChange(playingSong)
+                    } else {
+                        stopMediaPlayer()
+                    }
+                }
             }
         }
 
-        viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-            println("DEBUG: IsPlaying state changed: $isPlaying")
-            adapter.notifyDataSetChanged()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isPlaying.collectLatest { isPlaying ->
+                    Log.d("RecommendationsFragment", "IsPlaying state changed: $isPlaying")
+                    adapter.notifyDataSetChanged()
 
-            // Only handle play/pause if we have a current song
-            if (viewModel.currentlyPlayingSong.value != null) {
-                handlePlayPauseState(isPlaying)
+                    // Only handle play/pause if we have a current song
+                    if (viewModel.currentlyPlayingSong.value != null) {
+                        handlePlayPauseState(isPlaying)
+                    }
+                }
             }
         }
     }
@@ -122,7 +153,8 @@ class RecommendationsFragment : Fragment() {
     private fun handleSongChange(song: Song) {
         val previewUrl = song.previewUrl
         if (previewUrl.isNullOrEmpty()) {
-            println("DEBUG: No preview URL for song ${song.title}")
+            Log.d("RecommendationsFragment", "No preview URL for song ${song.title}")
+            Toast.makeText(requireContext(), "No preview available for this song", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -141,9 +173,10 @@ class RecommendationsFragment : Fragment() {
     private fun prepareMediaPlayer(previewUrl: String) {
         try {
             mediaPlayer = MediaPlayer().apply {
+                setAudioStreamType(AudioManager.STREAM_MUSIC)
                 setDataSource(previewUrl)
                 setOnPreparedListener {
-                    println("DEBUG: MediaPlayer prepared - starting playback")
+                    Log.d("RecommendationsFragment", "MediaPlayer prepared - starting playback")
                     isMediaPlayerPrepared = true
                     // Only start if we're supposed to be playing
                     if (viewModel.isPlaying.value == true) {
@@ -151,24 +184,26 @@ class RecommendationsFragment : Fragment() {
                     }
                 }
                 setOnCompletionListener {
-                    println("DEBUG: Playback completed")
+                    Log.d("RecommendationsFragment", "Playback completed")
                     isMediaPlayerPrepared = false
                     viewModel.onPlaybackCompleted()
                 }
                 setOnErrorListener { mp, what, extra ->
-                    println("DEBUG: MediaPlayer error: $what, $extra")
+                    Log.e("RecommendationsFragment", "MediaPlayer error: $what, $extra")
                     isMediaPlayerPrepared = false
                     viewModel.onPlaybackError()
+                    Toast.makeText(requireContext(), "Playback error occurred", Toast.LENGTH_SHORT).show()
                     true
                 }
                 prepareAsync()
             }
-            println("DEBUG: Started preparing MediaPlayer for: $previewUrl")
+            Log.d("RecommendationsFragment", "Started preparing MediaPlayer for: $previewUrl")
         } catch (e: Exception) {
-            println("DEBUG: Error setting up MediaPlayer: ${e.message}")
+            Log.e("RecommendationsFragment", "Error setting up MediaPlayer: ${e.message}")
             e.printStackTrace()
             isMediaPlayerPrepared = false
             viewModel.onPlaybackError()
+            Toast.makeText(requireContext(), "Failed to prepare audio playback", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -177,15 +212,15 @@ class RecommendationsFragment : Fragment() {
             // Only start if media player is prepared
             if (isMediaPlayerPrepared && mediaPlayer?.isPlaying == false) {
                 mediaPlayer?.start()
-                println("DEBUG: MediaPlayer started")
+                Log.d("RecommendationsFragment", "MediaPlayer started")
             } else if (!isMediaPlayerPrepared) {
-                println("DEBUG: MediaPlayer not prepared yet, waiting for preparation...")
+                Log.d("RecommendationsFragment", "MediaPlayer not prepared yet, waiting for preparation...")
             }
         } else {
             // Pause playback if playing
             if (mediaPlayer?.isPlaying == true) {
                 mediaPlayer?.pause()
-                println("DEBUG: MediaPlayer paused")
+                Log.d("RecommendationsFragment", "MediaPlayer paused")
             }
         }
     }
@@ -197,13 +232,13 @@ class RecommendationsFragment : Fragment() {
                     mp.stop()
                 }
                 mp.release()
-                println("DEBUG: MediaPlayer stopped and released")
+                Log.d("RecommendationsFragment", "MediaPlayer stopped and released")
             } catch (e: Exception) {
-                println("DEBUG: Error stopping MediaPlayer: ${e.message}")
+                Log.e("RecommendationsFragment", "Error stopping MediaPlayer: ${e.message}")
                 try {
                     mp.release()
                 } catch (releaseEx: Exception) {
-                    println("DEBUG: Error releasing MediaPlayer: ${releaseEx.message}")
+                    Log.e("RecommendationsFragment", "Error releasing MediaPlayer: ${releaseEx.message}")
                 }
             }
         }
@@ -212,24 +247,29 @@ class RecommendationsFragment : Fragment() {
         isMediaPlayerPrepared = false
     }
 
-    // Helper method to check if MediaPlayer is in a prepared state
-    private fun isMediaPlayerPrepared(mp: MediaPlayer): Boolean {
-        return try {
-            // Try to get current position - if it doesn't throw an exception,
-            // the MediaPlayer is likely in a prepared state
-            mp.currentPosition
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-
     private fun setupClickListeners() {
         btnSaveToLog.setOnClickListener {
             selectedSong?.let { song ->
-                // TODO: Save to database
-                requireActivity().onBackPressed()
+                val mood = viewModel.selectedMood.value ?: "Unknown"
+
+                Log.d("RecommendationsFragment", "Saving mood log: mood=$mood, song=${song.title}, artist=${song.artist}")
+
+                viewModel.saveMoodLog(
+                    mood = mood,
+                    songTitle = song.title,
+                    artist = song.artist,
+                    albumCoverUrl = song.albumCoverUrl,
+                    note = ""
+                )
+
+                // Show confirmation
+                Toast.makeText(requireContext(), "Mood saved!", Toast.LENGTH_SHORT).show()
+
+                // Navigate to history
+                findNavController().navigate(R.id.moodHistoryFragment)
+            } ?: run {
+                Log.d("RecommendationsFragment", "No song selected when trying to save")
+                Toast.makeText(requireContext(), "Please select a song first", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -249,7 +289,7 @@ class RecommendationsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Resume playback if it was playing
-        if (viewModel.isPlaying.value == true) {
+        if (viewModel.isPlaying.value == true && isMediaPlayerPrepared) {
             mediaPlayer?.start()
         }
     }

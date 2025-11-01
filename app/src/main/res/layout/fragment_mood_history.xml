@@ -2,13 +2,99 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mood History"
-        android:textSize="24sp" />
+        android:text="Your Mood History"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Filter Buttons -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:id="@+id/filterContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFilterHappy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="😊 Happy"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFilterSad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="😢 Sad"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFilterCalm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="😌 Calm"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFilterEnergetic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Energetic"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFilterChill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌙 Chill" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Stats Summary -->
+    <TextView
+        android:id="@+id/tvStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total entries: 0"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center" />
+
+    <!-- Mood History List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMoodHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Empty State -->
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="No mood entries yet.\nSelect a mood to get started!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone" />
 
 </LinearLayout>

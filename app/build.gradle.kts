@@ -69,17 +69,6 @@ dependencies {
         // Optional: For better RecyclerView
         implementation(libs.androidx.recyclerview)
 
-    // Spotify Auth (for authentication)
-    implementation(libs.spotify.auth)
 
-    // For handling redirects
-    implementation(libs.browser)
-
-    // For secure storage of tokens
-    implementation(libs.security.crypto)
-
-    // For HTTP requests
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
 
 }
