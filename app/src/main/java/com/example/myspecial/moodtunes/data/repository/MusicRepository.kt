@@ -19,5 +19,5 @@ data class Song(
     val artist: String,
     val albumCoverUrl: String? = null,
     val previewUrl: String? = null,  // For 30-second preview
-    val externalUrl: String? = null   // Full track on Spotify
+    val externalUrl: String? = null
 )

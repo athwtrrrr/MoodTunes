@@ -15,6 +15,7 @@ class MoodSelectFragment : Fragment() {
 
     private lateinit var viewModel: SharedViewModel
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,19 +56,13 @@ class MoodSelectFragment : Fragment() {
         view.findViewById<Button>(R.id.btnRomantic).setOnClickListener {
             navigateToRecommendations("romantic")
         }
-
-
-        view.findViewById<Button>(R.id.btnViewHistory).setOnClickListener {
-            findNavController().navigate(R.id.action_moodSelectFragment_to_moodHistoryFragment)
-        }
     }
 
     private fun navigateToRecommendations(mood: String) {
         // Set the mood in ViewModel first
         viewModel.setSelectedMood(mood)
 
-        // Then navigate
-        val action = MoodSelectFragmentDirections.actionMoodSelectFragmentToRecommendationsFragment(mood)
-        findNavController().navigate(action)
+        // Then navigate using the action ID
+        findNavController().navigate(R.id.action_moodSelectFragment_to_recommendationsFragment)
     }
 }

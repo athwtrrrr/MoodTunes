@@ -10,24 +10,32 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myspecial.moodtunes.R
 import com.example.myspecial.moodtunes.data.model.MoodLog
 import com.example.myspecial.moodtunes.viewmodel.SharedViewModel
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MoodHistoryFragment : Fragment() {
 
-    private lateinit var viewModel: SharedViewModel
+    private val viewModel: SharedViewModel by viewModels(
+        ownerProducer = { requireActivity() }
+    )
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MoodHistoryAdapter
     private lateinit var tvEmptyState: TextView
     private lateinit var tvStats: TextView
+    private lateinit var btnAnalyze: MaterialButton
 
     companion object {
         private const val TAG = "MoodHistoryFragment"
@@ -43,11 +51,6 @@ class MoodHistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(SharedViewModel::class.java)
-
         initViews(view)
         setupRecyclerView()
         setupFilterButtons()
@@ -60,6 +63,7 @@ class MoodHistoryFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rvMoodHistory)
         tvEmptyState = view.findViewById(R.id.tvEmptyState)
         tvStats = view.findViewById(R.id.tvStats)
+        btnAnalyze = view.findViewById(R.id.btnAnalyze)
     }
 
     private fun setupRecyclerView() {
@@ -92,14 +96,20 @@ class MoodHistoryFragment : Fragment() {
         }
     }
 
+
     private fun setupObservers() {
         // Collect the filtered mood logs Flow
-        lifecycleScope.launch {
-            viewModel.filteredMoodLogs.collectLatest { moodLogs ->
-                Log.d(TAG, "Flow updated with ${moodLogs.size} mood logs")
-                adapter.submitList(moodLogs)
-                updateEmptyState(moodLogs.isEmpty())
-                updateStats(moodLogs)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.filteredMoodLogs.collectLatest { moodLogs ->
+                    Log.d(TAG, "Flow updated with ${moodLogs.size} mood logs")
+                    adapter.submitList(moodLogs)
+                    updateEmptyState(moodLogs.isEmpty())
+                    updateStats(moodLogs)
+
+                    // Enable/disable analyze button based on whether we have data
+                    btnAnalyze.isEnabled = moodLogs.isNotEmpty()
+                }
             }
         }
     }
