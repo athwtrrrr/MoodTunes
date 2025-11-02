@@ -10,7 +10,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Mood colors -->
-    <color name="happy_color">#FFD32F2F</color>      <!-- Red/Orange for happy -->
+    <color name="happy_color">#FF5722</color>      <!-- Red/Orange for happy -->
     <color name="sad_color">#1976D2</color>          <!-- Blue for sad -->
     <color name="calm_color">#388E3C</color>         <!-- Green for calm -->
     <color name="energetic_color">#FBC02D</color>    <!-- Yellow for energetic -->
