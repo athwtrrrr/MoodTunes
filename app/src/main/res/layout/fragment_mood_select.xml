@@ -1,150 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
+    android:background="@drawable/gradient_background">
 
+    <!-- Top Bar with Profile and Notification -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="50dp">
+
+        <!-- Profile Section (Left) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/ivProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="User profile"
+                android:layout_marginEnd="12dp"
+                app:tint="@android:color/white" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome back!"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="User"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Notification Icon (Right) -->
+        <ImageView
+            android:id="@+id/ivNotification"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="Notifications"
+            android:padding="9dp"
+            android:src="@drawable/ic_notification"
+            app:tint="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- New Text View Above Card -->
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="How are you feeling?"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
-
-    <!-- Row 1: Happy and Sad -->
-    <LinearLayout
+        android:id="@+id/tvMoodPrompt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Do you want to create a playlist to analyse your mood?\nShare your feeling now!"
+        android:textSize="27sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textStyle= "bold"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginTop="50dp" />
+
+    <!-- Mood Selection Card with Navigation Arrows -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="24dp">
 
-        <Button
-            android:id="@+id/btnHappy"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="😊 Happy"
-            android:textSize="16sp"
-            android:backgroundTint="@color/happy_color"
-            android:textColor="@android:color/white" />
+        <!-- Left Arrow -->
 
-        <Button
-            android:id="@+id/btnSad"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="😢 Sad"
-            android:textSize="16sp"
-            android:backgroundTint="@color/sad_color"
-            android:textColor="@android:color/white" />
+        <ImageButton
+            android:id="@+id/btnLeftArrow"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_left"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Previous mood"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Mood Card -->
+
+        <!-- Right Arrow -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/moodCard"
+            android:layout_width="200dp"
+            android:layout_height="240dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Mood Image -->
+                <ImageView
+                    android:id="@+id/ivMoodImage"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_marginBottom="16dp"
+                    android:scaleType="centerInside" />
+
+                <!-- Mood Name -->
+                <TextView
+                    android:id="@+id/tvMoodName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Happy"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <ImageButton
+            android:id="@+id/btnRightArrow"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_right"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Next mood"
+            android:layout_marginStart="16dp" />
 
     </LinearLayout>
 
-    <!-- Row 2: Calm and Energetic -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="16dp">
-
-        <Button
-            android:id="@+id/btnCalm"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="😌 Calm"
-            android:textSize="16sp"
-            android:backgroundTint="@color/calm_color"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/btnEnergetic"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="⚡ Energetic"
-            android:textSize="16sp"
-            android:backgroundTint="@color/energetic_color"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-
-    <!-- Row 3: Chill and Angry -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="16dp">
-
-        <Button
-            android:id="@+id/btnChill"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="🎵 Focused"
-            android:textSize="16sp"
-            android:backgroundTint="@color/focused_color"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:id="@+id/btnAngry"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="😠 Angry"
-            android:textSize="16sp"
-            android:backgroundTint="@color/angry_color"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-
-    <!-- Row 4: Romantic (centered) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="32dp">
-
-        <Button
-            android:id="@+id/btnRomantic"
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:text="❤️ Romantic"
-            android:textSize="16sp"
-            android:backgroundTint="@color/romantic_color"
-            android:textColor="@android:color/white" />
-
-        <!-- Empty space to maintain layout balance -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:visibility="invisible" />
-
-    </LinearLayout>
-
-    <!-- History Button -->
     <Button
-        android:id="@+id/btnViewHistory"
+        android:id="@+id/btnSelectMood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Mood History"
-        android:layout_marginTop="16dp" />
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/purple_500"
+        android:padding="16dp"
+        android:text="SELECT THIS MOOD"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Select Button - Moved up right below the card -->
 
 </LinearLayout>

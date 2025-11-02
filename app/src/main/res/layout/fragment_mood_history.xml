@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/gradient_background">
 
     <!-- Header with Title and Analyze Button -->
     <LinearLayout
@@ -18,9 +19,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Your Mood History"
+            android:text="Mood Playlist"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/white"
             android:gravity="start" />
 
         <com.google.android.material.button.MaterialButton
@@ -34,68 +36,48 @@
 
     </LinearLayout>
 
-    <!-- Filter Buttons -->
-    <HorizontalScrollView
+    <!-- Search Bar and Sort Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_marginBottom="16dp">
 
-        <LinearLayout
-            android:id="@+id/filterContainer"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            app:startIconDrawable="@drawable/ic_search">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search songs..."
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:text="Sort"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            app:icon="@drawable/ic_sort"
+            app:iconGravity="textStart" />
 
-            <Button
-                android:id="@+id/btnFilterAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All"
-                android:layout_marginEnd="8dp" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/btnFilterHappy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="😊 Happy"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/btnFilterSad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="😢 Sad"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/btnFilterCalm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="😌 Calm"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/btnFilterEnergetic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚡ Energetic"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/btnFilterChill"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🌙 Chill" />
-
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- Stats Summary -->
+    <!-- Current Filter/Sort Info -->
     <TextView
-        android:id="@+id/tvStats"
+        android:id="@+id/tvCurrentSort"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total entries: 0"
+        android:text="Showing: All songs • Newest first"
         android:textSize="14sp"
         android:layout_marginBottom="16dp"
         android:gravity="center" />
@@ -118,3 +100,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+

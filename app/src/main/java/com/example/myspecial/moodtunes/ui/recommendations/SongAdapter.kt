@@ -12,7 +12,7 @@ import com.example.myspecial.moodtunes.viewmodel.SharedViewModel
 
 class SongAdapter(
     private var songs: List<Song>,
-    private val onSongSelected: (Song) -> Unit,
+    private val onSongSelected: (Song?) -> Unit, // Changed to nullable to handle deselection
     private val viewModel: SharedViewModel
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
@@ -46,20 +46,12 @@ class SongAdapter(
             viewModel.loadImageForView(song.albumCoverUrl, holder.albumCover)
         }
 
-        // Show selection state
+        // Show selection state - FIXED: Allow deselection
         val isSelected = position == selectedPosition
         holder.selectedIcon.setImageResource(
-            if (isSelected) android.R.drawable.checkbox_on_background
-            else android.R.drawable.checkbox_off_background
+            if (isSelected) R.drawable.ic_check_circle_filled // Custom check icon
+            else R.drawable.ic_radio_button_unchecked // Custom unchecked icon
         )
-
-        // DEBUG: Check all song data
-        println("DEBUG Song Data for '${song.title}':")
-        println("  - ID: ${song.id}")
-        println("  - Title: ${song.title}")
-        println("  - Artist: ${song.artist}")
-        println("  - Preview URL: ${song.previewUrl}")
-        println("  - Album Cover URL: ${song.albumCoverUrl}")
 
         // Handle play button visibility and state using ViewModel's state
         val hasPreview = !song.previewUrl.isNullOrEmpty()
@@ -82,19 +74,24 @@ class SongAdapter(
         holder.itemView.setOnClickListener {
             val currentPosition = holder.adapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                selectedPosition = currentPosition
-                onSongSelected(songs[currentPosition])
+                // FIXED: Toggle selection - if clicking the same item, deselect it
+                if (selectedPosition == currentPosition) {
+                    selectedPosition = -1
+                    onSongSelected(null) // Notify that selection was cleared
+                } else {
+                    selectedPosition = currentPosition
+                    onSongSelected(songs[currentPosition])
+                }
                 notifyDataSetChanged()
             }
         }
 
-        // Play button click listener - use ViewModel's toggle method
+        // Play button click listener
         holder.playButton.setOnClickListener {
             val currentPosition = holder.adapterPosition
             if (currentPosition != RecyclerView.NO_POSITION) {
-                // FIX: Use the correct method name - togglePlayback instead of togglePlayPause
                 viewModel.togglePlayback(songs[currentPosition])
-                notifyDataSetChanged() // Refresh to show state change
+                notifyDataSetChanged()
             }
         }
     }
@@ -114,5 +111,11 @@ class SongAdapter(
 
     fun getSelectedSong(): Song? {
         return if (selectedPosition != -1) songs[selectedPosition] else null
+    }
+
+    // New method to clear selection
+    fun clearSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
     }
 }

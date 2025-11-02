@@ -62,11 +62,18 @@ class MoodAnalysisFragment : Fragment() {
         tvRecommendations = view.findViewById(R.id.tvRecommendations)
         btnAnalyze = view.findViewById(R.id.btnAnalyze)
         btnBackToHistory = view.findViewById(R.id.btnBackToHistory)
+
+
+
     }
 
     private fun setupClickListeners() {
         btnAnalyze.setOnClickListener {
             viewModel.analyzeMoodPatterns()
+        }
+
+        btnBackToHistory.setOnClickListener {
+            findNavController().navigate(R.id.moodHistoryFragment)
         }
 
     }

@@ -22,7 +22,10 @@ data class MoodLog(
     val albumCoverUrl: String? = null,
 
     @ColumnInfo(name = "note")
-    val note: String = "",  // Fixed: non-null with default value
+    val note: String = "",
+
+    @ColumnInfo(name = "is_favorite")
+    val isFavorite: Boolean = false,
 
     @ColumnInfo(name = "timestamp")
     val timestamp: Long = System.currentTimeMillis()

@@ -68,7 +68,7 @@ class RecommendationsFragment : Fragment() {
 
         // Set initial mood title
         viewModel.selectedMood.value?.let { mood ->
-            tvMoodTitle.text = "Songs for $mood Mood"
+            tvMoodTitle.text = "Songs for $mood mood"
         }
     }
 
@@ -113,7 +113,7 @@ class RecommendationsFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.selectedMood.collectLatest { mood ->
                     mood?.let {
-                        tvMoodTitle.text = "Songs for $mood Mood"
+                        tvMoodTitle.text = "Songs for $mood mood"
                     }
                 }
             }

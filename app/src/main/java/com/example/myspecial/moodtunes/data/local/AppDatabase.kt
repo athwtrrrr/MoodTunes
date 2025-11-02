@@ -10,7 +10,7 @@ import com.example.myspecial.moodtunes.data.model.MoodLog
 
 @Database(
     entities = [MoodLog::class],
-    version = 3,  // Increment to 3 to be safe
+    version = 4,  // Increment to 4 for the new favorite field
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -20,11 +20,10 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        // Migration from version 2 to 3 (in case you need it)
-        private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+        // Migration from version 3 to 4 to add is_favorite column
+        private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Since we're using exportSchema = false and in development,
-                // we can let Room handle simple schema changes
+                database.execSQL("ALTER TABLE mood_logs ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0")
             }
         }
 
@@ -35,7 +34,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "moodtunes_database"
                 )
-                    .fallbackToDestructiveMigration() // This will destroy and recreate on any schema conflict
+                    .addMigrations(MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
                 instance

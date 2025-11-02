@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="mood_images">
+        <item>@drawable/mood_happy</item>
+        <item>@drawable/mood_sad</item>
+        <item>@drawable/mood_calm</item>
+        <item>@drawable/mood_energetic</item>
+        <item>@drawable/mood_focused</item>
+        <item>@drawable/mood_angry</item>
+        <item>@drawable/mood_romantic</item>
+    </array>
+
+    <string-array name="mood_names">
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Calm</item>
+        <item>Energetic</item>
+        <item>Focused</item>
+        <item>Angry</item>
+        <item>Romantic</item>
+    </string-array>
+
+
+    <array name="mood_colors">
+        <item>@color/happy_color</item>
+        <item>@color/sad_color</item>
+        <item>@color/calm_color</item>
+        <item>@color/energetic_color</item>
+        <item>@color/focused_color</item>
+        <item>@color/angry_color</item>
+        <item>@color/romantic_color</item>
+    </array>
+
+    <string-array name="mood_queries">
+        <item>happy</item>
+        <item>sad</item>
+        <item>calm</item>
+        <item>energetic</item>
+        <item>focused</item>
+        <item>angry</item>
+        <item>romantic</item>
+    </string-array>
+</resources>

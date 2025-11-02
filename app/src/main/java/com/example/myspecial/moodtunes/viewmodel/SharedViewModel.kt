@@ -43,17 +43,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
-    // Mood logs filtering
-    private val _currentFilter = MutableStateFlow("All")
-    val currentFilter: StateFlow<String> = _currentFilter.asStateFlow()
-
-    // Combine flows for filtered mood logs
-    val filteredMoodLogs = _currentFilter.combine(moodLogDao.getAllMoodLogs()) { filter, allLogs ->
-        when (filter) {
-            "All" -> allLogs
-            else -> allLogs.filter { it.mood == filter }
-        }
-    }
 
     private val _moodAnalysis = MutableStateFlow<MoodAnalysis?>(null)
     val moodAnalysis: StateFlow<MoodAnalysis?> = _moodAnalysis.asStateFlow()
@@ -62,6 +51,15 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     val isAnalyzing: StateFlow<Boolean> = _isAnalyzing.asStateFlow()
 
     private val imageLoadingJobs = mutableMapOf<String, kotlinx.coroutines.Job>()
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _sortOption = MutableStateFlow("newest") // newest, oldest, mood, favorites
+    val sortOption: StateFlow<String> = _sortOption.asStateFlow()
+
+    private val _selectedMoodForSort = MutableStateFlow<String?>(null)
+    val selectedMoodForSort: StateFlow<String?> = _selectedMoodForSort.asStateFlow()
 
     // Mood and song methods
     fun setSelectedMood(mood: String) {
@@ -175,9 +173,87 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    // Filter mood logs by mood type
-    fun filterMoodLogs(moodType: String) {
-        _currentFilter.value = moodType
+    // Update the filteredMoodLogs to handle the new sorting logic
+    val filteredMoodLogs = combine(
+        _searchQuery,
+        _sortOption,
+        _selectedMoodForSort,
+        moodLogDao.getAllMoodLogs()
+    ) { query, sort, moodFilter, allLogs ->
+        var filtered = allLogs
+
+        // Apply mood filter when sorting by mood
+        if (sort == "mood" && moodFilter != null) {
+            filtered = filtered.filter { it.mood.equals(moodFilter, ignoreCase = true) }
+        }
+
+        // Apply search filter
+        if (query.isNotBlank()) {
+            filtered = filtered.filter { moodLog ->
+                moodLog.songTitle.contains(query, ignoreCase = true) ||
+                        moodLog.artist.contains(query, ignoreCase = true) ||
+                        moodLog.note.contains(query, ignoreCase = true)
+            }
+        }
+
+        // Apply sorting
+        filtered = when (sort) {
+            "oldest" -> filtered.sortedBy { it.timestamp }
+            "mood" -> {
+                // When sorting by mood, show selected mood first, then sort others by timestamp
+                if (moodFilter != null) {
+                    filtered.sortedByDescending { it.timestamp } // Keep selected mood in time order
+                } else {
+                    filtered.sortedBy { it.mood } // Fallback: sort all by mood name
+                }
+            }
+            "favorites" -> filtered.sortedByDescending { it.isFavorite }
+            else -> filtered.sortedByDescending { it.timestamp } // newest first
+        }
+
+        filtered
+    }
+
+    // Add these methods to SharedViewModel class
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun setSortOption(option: String) {
+        _sortOption.value = option
+    }
+
+    fun setSelectedMoodForSort(mood: String?) {
+        _selectedMoodForSort.value = mood
+    }
+
+    // Method to get current sort display text
+    fun getCurrentSortDisplay(): String {
+        return when (_sortOption.value) {
+            "newest" -> "All songs • Newest first"
+            "oldest" -> "All songs • Oldest first"
+            "favorites" -> "All songs • Favorites first"
+            "mood" -> {
+                val mood = _selectedMoodForSort.value
+                if (mood != null) {
+                    "$mood mood • Newest first"
+                } else {
+                    "All songs • By mood"
+                }
+            }
+            else -> "All songs • Newest first"
+        }
+    }
+
+    fun toggleFavorite(moodLog: MoodLog) {
+        viewModelScope.launch {
+            try {
+                val updatedMoodLog = moodLog.copy(isFavorite = !moodLog.isFavorite)
+                moodLogDao.updateMoodLog(updatedMoodLog)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     // Get stats for display
@@ -368,7 +444,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
         val dominantPercentage = (moodFrequencies[dominantMood]?.toFloat() ?: 0f) / totalLogs * 100
 
-        insights.add("Your most common mood is **$dominantMood** (${"%.0f".format(dominantPercentage)}% of your songs)")
+        insights.add("Your most common mood is $dominantMood (${"%.0f".format(dominantPercentage)}% of your songs)")
 
         // Mood-specific insights - UPDATED TO MATCH YOUR ACTUAL MOODS
         when (dominantMood.toLowerCase()) {

@@ -1,17 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="16dp"
     android:background="?android:attr/selectableItemBackground">
 
-    <ImageView
-        android:id="@+id/ivAlbumCover"
+    <!-- FrameLayout to overlay play button on album cover -->
+    <FrameLayout
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_music_note" />
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/ivAlbumCover"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_music_note" />
+
+        <!-- Floating play button with shadow -->
+        <ImageView
+            android:id="@+id/ivPlayButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_play"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/bg_play_button_floating"
+            android:padding="6dp"
+            app:tint="@android:color/white"
+            android:visibility="gone"
+            android:contentDescription="Play preview"
+            android:elevation="4dp" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -35,24 +58,17 @@
             android:layout_height="wrap_content"
             android:text="Artist Name"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/ivPlayButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/ic_play"
-        android:padding="4dp"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="Play preview" />
-
+    <!-- Nicer selection icon -->
     <ImageView
         android:id="@+id/ivSelected"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@android:drawable/checkbox_off_background"
+        android:src="@drawable/ic_radio_button_unchecked"
+        app:tint="?attr/colorPrimary"
         android:visibility="visible" />
 
 </LinearLayout>
