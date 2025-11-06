@@ -6,7 +6,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white)
 ![Room Database](https://img.shields.io/badge/Room-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
 
-A beautiful Android app that connects your emotions with music through intelligent mood tracking and personalized recommendations.
+A Android app that connects your emotions with music through intelligent mood tracking and personalized recommendations.
 
 [Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Installation](#installation) 
 
