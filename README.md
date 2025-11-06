@@ -71,16 +71,18 @@ Mood Tunes is a mobile-first application that bridges emotional awareness with m
 - **Genre-based Chart**: Intelligent mood-to-music mapping
 
 ## 🏗 Architecture
+
+```bash
 app/
 ├── data/
-│ ├── local/ # Room database & entities
-│ ├── repository/ # Data repositories
-│ └── api/ # Deezer API integration
+│   ├── local/         # Room database & entities
+│   ├── repository/    # Data repositories
+│   └── api/           # Deezer API integration
 ├── ui/
-│ ├── fragments/ # 4 main fragments
-│ ├── adapters/ # RecyclerView adapters
-│ └── viewmodels/ # SharedViewModel
-└── utils/ # Shared utilities
+│   ├── fragments/     # 4 main fragments
+│   ├── adapters/      # RecyclerView adapters
+│   └── viewmodels/    # SharedViewModel
+└── utils/             # Shared utilities
 ### Key Architecture Decisions
 
 1. **Single Activity Architecture**: Uses Navigation Component with fragments
