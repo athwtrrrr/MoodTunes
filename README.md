@@ -83,6 +83,7 @@ app/
 │   ├── adapters/      # RecyclerView adapters
 │   └── viewmodels/    # SharedViewModel
 └── utils/             # Shared utilities
+```
 ### Key Architecture Decisions
 
 1. **Single Activity Architecture**: Uses Navigation Component with fragments
