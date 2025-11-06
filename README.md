@@ -8,7 +8,7 @@
 
 A beautiful Android app that connects your emotions with music through intelligent mood tracking and personalized recommendations.
 
-[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Installation](#installation) • [Demo](#demo)
+[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Installation](#installation) 
 
 </div>
 
@@ -42,9 +42,11 @@ Mood Tunes is a mobile-first application that bridges emotional awareness with m
 
 <div align="center">
 
-| Mood Selection | Song Recommendations | History & Analytics |
-|:--------------:|:--------------------:|:-------------------:|
-| <img src="https://via.placeholder.com/250x500/4A6572/FFFFFF?text=Mood+Selection" width="200" />![img.png](img.png) | <img src="https://via.placeholder.com/250x500/4A6572/FFFFFF?text=Recommendations" width="200" />![img_1.png](img_1.png) | <img src="https://via.placeholder.com/250x500/4A6572/FFFFFF?text=History" width="200" />![img_2.png](img_2.png) |![img_3.png](img_3.png) |
+| Mood Selection | Song Recommendations | History | Analytics |
+|:--------------:|:--------------------:|:--------:|:----------:|
+| <img width="502" height="1110" alt="Mood Selection" src="https://github.com/user-attachments/assets/0fc413cb-d02d-4078-beb1-32f1d0d2b467" /> | <img width="502" height="1110" alt="Song Recommendations" src="https://github.com/user-attachments/assets/24597a56-e4b6-4e58-a476-9425cddaf032" /> | <img width="498" height="1110" alt="History" src="https://github.com/user-attachments/assets/a34e06d6-37aa-46bd-921e-7940a450fe56" /> | <img width="498" height="1110" alt="Analytics" src="https://github.com/user-attachments/assets/9ac94875-c4f7-4d8f-a7a1-356d8644b8c6" /> |
+
+
 
 </div>
 
